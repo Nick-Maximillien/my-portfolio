@@ -9,7 +9,7 @@ export default function Footer() {
     <footer className="footer">
       <div className="footerContainer">
         <p>
-          &copy; {year} Nicholas Muthoki. All rights reserved.
+          &copy; {year} Nick Muthoki | All rights reserved.
         </p>
         <div className="footerLinks">
           <Link href="/about">About</Link>
