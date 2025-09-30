@@ -7,7 +7,7 @@ export default function AutoBooksPage() {
   return (
     <>
       <main className="projectPage">
-        <div className="header">
+        <div className="heade">
           <h1>AutoBooks AI</h1>
           <p>AI-powered accounting and financial copilot for SMEs — IFRS-compliant, real-time insights, and document intelligence.</p>
         </div>
@@ -84,6 +84,13 @@ export default function AutoBooksPage() {
             AutoBooks AI was built with a focus on real SMEs — delivering clean, precise, and actionable financial intelligence. Every feature is designed to minimize friction, maximize automation, and make bookkeeping effortless. It runs silently, letting businesses focus on growth, not manual accounting.
           </p>
         </section>
+        <section className="ctaSection">
+        <h2>Work With Me</h2>
+        <p>Ready to start a project, collaborate with your team, or get expert guidance? Let's create impactful solutions together.</p>
+      </section>
+      <div className="ctaSection sec">
+        <Link href="/contact" className="ctaBtn">Get in Touch</Link>
+      </div>
 
         {/* Inline JSX Styles */}
         <style jsx>{`
@@ -222,6 +229,29 @@ export default function AutoBooksPage() {
               padding: 1rem;
             }
           }
+              .ctaSection {
+          text-align: center;
+        }
+
+        .ctaBtn {
+          display: inline-block;
+          margin-top: 1rem;
+          padding: 10px 18px;
+          border-radius: 6px;
+          background: var(--accent);
+          color: var(--foreground);
+          text-decoration: none;
+          font-weight: bold;
+          transition: background 0.2s ease;
+        }
+
+        .ctaBtn:hover {
+          background: #0052cc;
+        }
+          .sec {
+          margin-top: 40px;
+          }
+
 
           /* Landscape responsive */
           @media (orientation: landscape) and (min-width: 768px) {

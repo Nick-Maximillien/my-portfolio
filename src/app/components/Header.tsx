@@ -34,10 +34,10 @@ export default function Header() {
           <div className="logo">
             <Image
               className="logoImg"
-              src="/images/logo.png"
+              src="/logos/logo.png"
               alt="logo"
-              width={150}
-              height={70}
+              width={100}
+              height={50}
               priority
             />
           </div>

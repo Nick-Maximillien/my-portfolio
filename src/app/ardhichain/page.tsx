@@ -67,6 +67,13 @@ export default function ArdhiChainPage() {
           <h2>My Role</h2>
           <p>I designed the smart contract, developed the frontend UI, integrated MetaMask, deployed on Netlify/Sepolia, and tested admin functions.</p>
         </section>
+        <section className="ctaSection">
+        <h2>Work With Me</h2>
+        <p>Ready to start a project, collaborate with your team, or get expert guidance? Let's create impactful solutions together.</p>
+      </section>
+      <div className="ctaSection sec">
+        <Link href="/contact" className="ctaBtn">Get in Touch</Link>
+      </div>
 
         <style jsx>{`
           :root {
@@ -90,6 +97,28 @@ export default function ArdhiChainPage() {
           .video-wrapper iframe {width:100%; height:360px; border:none; border-radius:8px; box-shadow:0 4px 12px rgba(255,255,255,0.1);}
           .links a {display:inline-block; margin:0.3rem 1rem 1rem 0; background:#003366; color:white; padding:10px 18px; border-radius:6px; font-size:0.95rem; transition:background 0.2s;}
           .links a:hover {background:#0052cc;}
+
+           .ctaSection {
+          text-align: center;
+        }
+
+        .ctaBtn {
+          display: inline-block;
+          margin-top: 1rem;
+          padding: 10px 18px;
+          border-radius: 6px;
+          background: var(--accent);
+          color: var(--foreground);
+          text-decoration: none;
+          font-weight: bold;
+          transition: background 0.2s ease;
+        }
+
+        .ctaBtn:hover {
+          background: #0052cc;
+        }
+          .sec {
+          margin-top: 40px;
 
           @media (max-width:768px) {
             .video-wrapper iframe {height:240px;}

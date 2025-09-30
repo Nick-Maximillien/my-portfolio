@@ -80,6 +80,13 @@ export default function UrbanScopePage() {
           UrbanScope demonstrates how blockchain can support land governance by adding transparency and auditability. In contexts like Africa where urban expansion often lacks oversight, this project is a blueprint for decentralized civic infrastructure.
         </p>
       </section>
+      <section className="ctaSection">
+        <h2>Work With Me</h2>
+        <p>Ready to start a project, collaborate with your team, or get expert guidance? Let's create impactful solutions together.</p>
+      </section>
+      <div className="ctaSection sec">
+        <Link href="/contact" className="ctaBtn">Get in Touch</Link>
+      </div>
 
       {/* Inline styles */}
       <style jsx>{`
@@ -189,6 +196,28 @@ export default function UrbanScopePage() {
         .links a:hover {
           background: #0052cc;
         }
+          .ctaSection {
+          text-align: center;
+        }
+
+        .ctaBtn {
+          display: inline-block;
+          margin-top: 1rem;
+          padding: 10px 18px;
+          border-radius: 6px;
+          background: var(--accent);
+          color: var(--foreground);
+          text-decoration: none;
+          font-weight: bold;
+          transition: background 0.2s ease;
+        }
+
+        .ctaBtn:hover {
+          background: #0052cc;
+        }
+          .sec {
+          margin-top: 40px;
+          }
 
         /* Portrait responsive */
         @media (max-width: 768px) {

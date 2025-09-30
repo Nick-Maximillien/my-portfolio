@@ -1,4 +1,7 @@
+'use client'
+
 import Image from "next/image";
+import Link from "next/link";
 
 export default function VotingPage() {
   return (
@@ -74,6 +77,37 @@ export default function VotingPage() {
           I handled the fullstack development — from writing Solidity contracts to building the frontend interface, integrating wallet connection, and implementing vote charts. This project demonstrates a complete dApp lifecycle including UI/UX, governance logic, and on-chain analytics.
         </p>
       </section>
+      <section className="ctaSection">
+        <h2>Work With Me</h2>
+        <p>Ready to start a project, collaborate with your team, or get expert guidance? Let's create impactful solutions together.</p>
+      </section>
+      <div className="ctaSection sec">
+        <Link href="/contact" className="ctaBtn">Get in Touch</Link>
+      </div>
+      <style jsx>{`
+        .ctaSection {
+          text-align: center;
+        }
+
+        .ctaBtn {
+          display: inline-block;
+          margin-top: 1rem;
+          padding: 10px 18px;
+          border-radius: 6px;
+          background: var(--accent);
+          color: var(--foreground);
+          text-decoration: none;
+          font-weight: bold;
+          transition: background 0.2s ease;
+        }
+
+        .ctaBtn:hover {
+          background: #0052cc;
+        }
+          .sec {
+          margin-top: 40px;
+          }
+      `}</style>
     </main>
   );
 }

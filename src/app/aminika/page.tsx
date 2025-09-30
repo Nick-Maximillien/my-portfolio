@@ -124,6 +124,13 @@ export default function AminikaMedicalPage() {
             Let's build something impactful together. <Link href="/contactPage.html">Contact me</Link> to discuss your project.
           </p>
         </section>
+        <section className="ctaSection">
+        <h2>Work With Me</h2>
+        <p>Ready to start a project, collaborate with your team, or get expert guidance? Let's create impactful solutions together.</p>
+      </section>
+      <div className="ctaSection sec">
+        <Link href="/contact" className="ctaBtn">Get in Touch</Link>
+      </div>
 
         {/* Styles */}
         <style jsx>{`
@@ -239,6 +246,28 @@ export default function AminikaMedicalPage() {
             }
             h1 { font-size: 1.8rem; }
             h2 { font-size: 1.4rem; }
+          }
+              .ctaSection {
+          text-align: center;
+        }
+
+        .ctaBtn {
+          display: inline-block;
+          margin-top: 1rem;
+          padding: 10px 18px;
+          border-radius: 6px;
+          background: var(--accent);
+          color: var(--foreground);
+          text-decoration: none;
+          font-weight: bold;
+          transition: background 0.2s ease;
+        }
+
+        .ctaBtn:hover {
+          background: #0052cc;
+        }
+          .sec {
+          margin-top: 40px;
           }
 
           @media (orientation: landscape) and (min-width: 768px) {
