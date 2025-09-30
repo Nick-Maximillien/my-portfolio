@@ -1,7 +1,6 @@
 'use client';
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 
 export default function SmartAgrovetPage() {
   return (
@@ -19,7 +18,7 @@ export default function SmartAgrovetPage() {
         <section>
           <h2>📌 Project Overview</h2>
           <p>
-            Smart Agrovet is a full-featured online store for farm inputs, designed to streamline access to seeds, tools, and equipment for small and large-scale farmers. It's also intended to integrate with Agrosight AI — an AI-powered diagnosis engine that helps farmers identify crop issues via WhatsApp.
+            Smart Agrovet is a full-featured online store for farm inputs, designed to streamline access to seeds, tools, and equipment for small and large-scale farmers. It is also intended to integrate with Agrosight AI — an AI-powered diagnosis engine that helps farmers identify crop issues via WhatsApp.
           </p>
         </section>
 
@@ -74,7 +73,7 @@ export default function SmartAgrovetPage() {
         <section>
           <h2>📬 Let’s Work Together</h2>
           <p>
-            Need an e-commerce solution tailored for your industry — or want to blend AI with online sales? Let's build it.
+            Need an e-commerce solution tailored for your industry — or want to blend AI with online sales? Let us build it.
           </p>
           <p>
             <Link href="contactPage.html">📨 Contact Me</Link> <br/>
@@ -83,7 +82,7 @@ export default function SmartAgrovetPage() {
         </section>
         <section className="ctaSection">
         <h2>Work With Me</h2>
-        <p>Ready to start a project, collaborate with your team, or get expert guidance? Let's create impactful solutions together.</p>
+        <p>Ready to start a project, collaborate with your team, or get expert guidance? Let us create impactful solutions together.</p>
       </section>
       <div className="ctaSection sec">
         <Link href="/contact" className="ctaBtn">Get in Touch</Link>

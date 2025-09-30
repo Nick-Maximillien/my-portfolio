@@ -19,7 +19,7 @@ export default function BlogWebsitePage() {
         <section>
           <h2>Overview</h2>
           <p>
-            This blog platform was designed to help content creators, small businesses, and thought leaders publish and manage their posts effortlessly. It's built with <strong>React</strong> on the frontend and <strong>Strapi</strong> as the headless CMS backend.
+            This blog platform was designed to help content creators, small businesses, and thought leaders publish and manage their posts effortlessly. It is built with <strong>React</strong> on the frontend and <strong>Strapi</strong> as the headless CMS backend.
           </p>
         </section>
 
@@ -60,7 +60,7 @@ export default function BlogWebsitePage() {
         <section>
           <h2>Challenges Solved</h2>
           <p>
-            Integrating a headless CMS like Strapi with React involved understanding APIs, managing dynamic routing, and securing CORS and image assets. I implemented clean UI layouts using Bootstrap's grid system and ensured fast performance across devices.
+            Integrating a headless CMS like Strapi with React involved understanding APIs, managing dynamic routing, and securing CORS and image assets. I implemented clean UI layouts using Bootstrap grid system and ensured fast performance across devices.
           </p>
         </section>
 
@@ -76,13 +76,13 @@ export default function BlogWebsitePage() {
         <section>
           <h2>Interested in a custom blog?</h2>
           <p>
-            Let’s work together! <Link href="contactPage.html">Contact me</Link> to discuss your blog project.
+            Let us work together! <Link href="contactPage.html">Contact me</Link> to discuss your blog project.
           </p>
         </section>
 
         <section className="ctaSection">
         <h2>Work With Me</h2>
-        <p>Ready to start a project, collaborate with your team, or get expert guidance? Let's create impactful solutions together.</p>
+        <p>Ready to start a project, collaborate with your team, or get expert guidance? Let us create impactful solutions together.</p>
       </section>
       <div className="ctaSection sec">
         <Link href="/contact" className="ctaBtn">Get in Touch</Link>

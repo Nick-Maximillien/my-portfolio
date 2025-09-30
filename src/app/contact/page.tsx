@@ -84,9 +84,10 @@ export default function ContactPage() {
       </form>
 
       <blockquote>
-        "The future belongs to those who believe in the beauty of their dreams."
-        <p className="founder">– Eleanor Roosevelt</p>
-      </blockquote>
+       “The future belongs to those who believe in the beauty of their dreams.”
+      <p className="founder">– Eleanor Roosevelt</p>
+        </blockquote>
+
 
       <style jsx>{`
         .contactPag {

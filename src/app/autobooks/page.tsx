@@ -86,7 +86,7 @@ export default function AutoBooksPage() {
         </section>
         <section className="ctaSection">
         <h2>Work With Me</h2>
-        <p>Ready to start a project, collaborate with your team, or get expert guidance? Let's create impactful solutions together.</p>
+        <p>Ready to start a project, collaborate with your team, or get expert guidance? Let us create impactful solutions together.</p>
       </section>
       <div className="ctaSection sec">
         <Link href="/contact" className="ctaBtn">Get in Touch</Link>
