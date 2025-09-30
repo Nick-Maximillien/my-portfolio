@@ -82,8 +82,8 @@ export default function HomePage() {
           <Image
             src="/images/hero.png"
             alt="Hero Image"
-            width={350}
-            height={350}
+            width={150}
+            height={150}
             priority
           />
         </div>
