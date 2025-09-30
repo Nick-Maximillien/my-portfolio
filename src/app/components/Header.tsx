@@ -30,6 +30,18 @@ export default function Header() {
     <header className="header" style={{ position: 'sticky', top: 0, zIndex: 1000 }}>
       <div className="row headerContainer">
         <div className="head">
+          {/* Logo */}
+          <div className="logo">
+            <Image
+              className="logoImg"
+              src="/logos/logo.png"
+              alt="logo"
+              width={100}
+              height={50}
+              priority
+            />
+          </div>
+
           {/* Dropdown menu for portrait */}
           <nav className="nav dropdown-nav">
             <ul className="theMenu">
@@ -93,5 +105,3 @@ export default function Header() {
     </header>
   );
 }
-
- 
