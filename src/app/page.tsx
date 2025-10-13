@@ -70,11 +70,11 @@ export default function HomePage() {
           <h2>AI & Blockchain Builder | Consultant</h2>
           <p>
             I build and deploy intelligent systems for real-world problems. 
-            From AI-powered agritech platforms to Rust DeFi engines, I deliver end-to-end solutions.
+            From AI-powered agritech platforms to Rust DeFi engines, I deliver end-to-end solutions. I am the Lead Developer at <a href="https://ithoka.vercel.app/" style={{ color: "#0052cc"}} target="_blank" rel="noopener noreferrer">Ithoka Microsystems</a>, an AI & Blockchain consulting team.
           </p>
           <div className="ctaButtons">
             <Link href="/projects" className="ctaBtn">View Projects</Link>
-            <Link href="/contact" className="ctaBtnOutline">Get in Touch</Link>
+            <a href="https://ithoka.vercel.app/onboard" className="ctaBtnOutline">Start Your Project</a>
           </div>
         </div>
 
