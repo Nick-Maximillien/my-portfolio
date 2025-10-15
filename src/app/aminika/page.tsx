@@ -15,16 +15,16 @@ export default function AminikaMedicalPage() {
     <>
       <main className="projectPage">
         {/* Header */}
-        <div className="header">
+        <div className="heade">
           <h1>Aminika Medical Services</h1>
           <p>
             Accessible, affordable, and high-quality healthcare with patient-centered care.
           </p>
           <div className="header-buttons">
-            <Link href="https://aminika-medical.netlify.app" target="_blank">
+            <Link href="https://aminika-health-services.vercel.app" target="_blank">
               🌐 Live Site
             </Link>
-            <Link href="https://github.com/Nick-Maximillien/aminika-medical" target="_blank">
+            <Link href="https://github.com/Nick-Maximillien/aminika-health-services" target="_blank">
               📦 GitHub Source
             </Link>
           </div>
