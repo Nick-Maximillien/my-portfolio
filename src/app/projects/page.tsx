@@ -22,7 +22,7 @@ const projects = {
   Blockchain: [
     {
       name: "Rust DeFi Engine",
-      href: "/rust-defi",
+      href: "/in_progress",
       image: "/images/defi.png",
       description: "AI-powered Rust engine for DeFi applications."
     },

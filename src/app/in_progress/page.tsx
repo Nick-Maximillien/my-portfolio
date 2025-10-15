@@ -79,6 +79,11 @@ export default function InProgressPage() {
         </p>
         <Link href={"/"}><Image src="/logos/inProgress.png" alt="Under Construction" width={300} height={250} /></Link>
       </div>
+      <div>
+      <Link href="https://github.com/Nick-Maximillien/rust-ai-defi" target="_blank">
+              📦 GitHub Source
+            </Link>
+          </div>
 
       <div className="notifyForm">
         <h2>Notify Me</h2>
