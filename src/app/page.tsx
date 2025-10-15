@@ -11,6 +11,12 @@ const projects = [
     description: "Real-time crop disease detection platform deployable on WhatsApp, web & offline."
   },
   {
+    name: "Voting DApp",
+    href: "/voting",
+    image: "/images/voting.png",
+    description: "Blockchain Voting for Agricultural Cooperatives — Transparent, Tamper-Proof Elections."
+  },
+  {
     name: "AutoBooks AI",
     href: "/autobooks",
     image: "/images/autobooks.png",
@@ -21,12 +27,6 @@ const projects = [
     href: "/in_progress",
     image: "/images/defi.png",
     description: "AI-powered Rust engine for DeFi applications."
-  },
-  {
-    name: "Voting DApp",
-    href: "/voting",
-    image: "/images/voting.png",
-    description: "Blockchain Voting for Agricultural Cooperatives — Transparent, Tamper-Proof Elections."
   },
   {
     name: "UrbanScope Chain",
