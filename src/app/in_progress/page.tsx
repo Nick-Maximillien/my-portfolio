@@ -38,6 +38,11 @@ export default function InProgressPage() {
     <section className="inProgressPage">
       <div className="hero">
         <h1>Upcoming Project</h1>
+        <div>
+      <Link href="https://github.com/Nick-Maximillien/rust-ai-defi" target="_blank">
+              📦 GitHub Code
+            </Link>
+          </div>
         <p>
           I’m building an AI-powered Rust DeFi engine on the Internet Computer (ICP). 
           This project combines decentralized finance, high-performance Rust backends, 
