@@ -31,6 +31,7 @@ export default function AuditPage() {
       const result = await uploadForensicDocument(
         file,
         'Full compliance audit'
+        // Default scope 'clinical' is used here
       );
 
       // Once the result comes back, we replace the loading logs with the ACTUAL server trace

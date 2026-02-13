@@ -14,12 +14,14 @@ export default function ResearchPage() {
     protocol: string;
     code: string;
     text: string;
+    scope?: string[];
+    intent?: string[];
   }>>([]);
 
   // State for Agent Trace Logs
   const [trace, setTrace] = useState<NonNullable<ForensicResponse['agent_trace']>>([]);
 
-  // [NEW] State for toggling rule expansion (Set of indices)
+  // State for toggling rule expansion (Set of indices)
   const [expandedRules, setExpandedRules] = useState<Set<number>>(new Set());
 
   const toggleRule = (index: number) => {
@@ -40,10 +42,9 @@ export default function ResearchPage() {
     setFacts([]);
     setTrace([]);
     setSummary(null); 
-    setExpandedRules(new Set()); // Reset expansion on new search
+    setExpandedRules(new Set()); 
 
     try {
-      // 1. Initial "Thinking" Log
       setTrace([{ 
         timestamp: new Date().toISOString(), 
         step: "INIT", 
@@ -51,36 +52,34 @@ export default function ResearchPage() {
         status: "INFO" 
       }]);
 
-      // [FIX] Force a unique case ID for every request to prevent browser hang
       const uniqueCaseId = `RESEARCH-${Date.now()}`;
 
       const result = await runForensicAgent({
         case_id: uniqueCaseId,
         query,
         mode: 'research',
+        // Research mode allows broader search by default, but we can pass 'clinical' if needed.
+        // For now, we leave scope undefined to match "Universal Search" unless specified otherwise.
         claim_data: { events: [] }, 
       });
 
-      // 2. Update with Actual Logs from Backend
       if (result.agent_trace) {
         setTrace(result.agent_trace);
       }
 
-      // 3. Capture the Analysis/Summary (Research Mode stores this in final_report.llm_explanation)
-      // Check both locations just in case
       const narrative = result.audit_result?.llm_explanation || result.audit_result?.certification_statement;
       if (narrative) {
         setSummary(narrative);
       }
 
-      // 4. Capture the Evidence (Research Mode stores this in forensic_evidence.retrieved_facts)
-      // We map retrieved_facts OR violations depending on what came back
       const rawFacts = result.forensic_evidence?.retrieved_facts || [];
       
       const displayFacts = rawFacts.map((f: any) => ({
         protocol: f.protocol?.title || "Clinical Protocol",
         code: f.rule_code || "RULE",
-        text: f.text || "No description provided."
+        text: f.text || "No description provided.",
+        scope: f.scope || [],
+        intent: f.intent || []
       }));
 
       setFacts(displayFacts);
@@ -123,7 +122,7 @@ export default function ResearchPage() {
           </form>
         </section>
 
-        {/* 1. AGENT LOGS (Real-Time Visualization) */}
+        {/* 1. AGENT LOGS */}
         {trace.length > 0 && (
           <section className="trace-panel">
             <h2>Agent Execution Log</h2>
@@ -143,17 +142,33 @@ export default function ResearchPage() {
           </section>
         )}
 
-        {/* 2. FORENSIC ANALYSIS (THE ANSWER) */}
+        {/* 2. FORENSIC ANALYSIS */}
         {summary && (
           <section className="analysis-panel">
-            <h2>Forensic Analysis</h2>
+            <h2>Protocol Interpretation</h2>
+            <div 
+  className="analysis-disclaimer" 
+  style={{
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    color: '#e7ebf3',
+    padding: '15px',
+    borderRadius: '8px',
+    fontSize: '0.9rem',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+    border: '1px solid #d1dbe5',
+    fontWeight: '900'
+  }}
+>
+  This explanation is a grounded rendering of retrieved clinical protocol clauses. No clinical decisions, prioritization, or personalization is performed.
+</div>
+
             <div className="analysis-text whitespace-pre-wrap">
               {summary}
             </div>
           </section>
         )}
 
-        {/* 3. EVIDENCE GRID (Immutable Truths) */}
+        {/* 3. EVIDENCE GRID */}
         {facts.length > 0 && (
           <section className="results">
             <h2>Retrieved Clinical Facts</h2>
@@ -168,9 +183,16 @@ export default function ResearchPage() {
                   >
                     <span className="check">⚖️</span>
                     <div className="artifact-content">
-                      <div className="meta">
-                        {req.protocol} <span className="code">({req.code})</span>
+                      <div className="artifact-header">
+                          <div className="meta">
+                            {req.protocol} <span className="code">({req.code})</span>
+                          </div>
+                          <div className="badges">
+                            {req.scope?.map(s => <span key={s} className={`badge ${s.toLowerCase()}`}>{s}</span>)}
+                            {req.intent?.map(t => <span key={t} className={`badge ${t.toLowerCase()}`}>{t}</span>)}
+                          </div>
                       </div>
+                      
                       <div className="text">"{req.text}"</div>
                       <div className="hint-text">
                         {isExpanded ? 'Show Less' : 'Read More'}
@@ -183,7 +205,6 @@ export default function ResearchPage() {
           </section>
         )}
         
-        {/* Empty State for No Results */}
         {!loading && summary === null && trace.length > 1 && facts.length === 0 && (
             <div className="no-results">
                 <p>No relevant clinical protocols found for this query.</p>
@@ -405,6 +426,12 @@ export default function ResearchPage() {
           width: 100%;
         }
 
+        .artifact-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
         .meta {
           font-size: 0.75rem;
           text-transform: uppercase;
@@ -412,6 +439,29 @@ export default function ResearchPage() {
           font-weight: 700;
           letter-spacing: 0.02em;
         }
+
+        /* FULL SYSTEM BADGES */
+        .badges { display: flex; gap: 4px; flex-wrap: wrap; }
+        .badge {
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        /* Scopes */
+        .badge.clinical { background: rgba(59,130,246,0.15); color: #93c5fd; }
+        .badge.facility { background: rgba(234,88,12,0.15); color: #fdba74; }
+        .badge.billing { background: rgba(234, 179, 8, 0.15); color: #fde047; }
+        .badge.legal { background: rgba(236, 72, 153, 0.15); color: #f9a8d4; }
+
+        /* Intents */
+        .badge.safety { background: rgba(239,68,68,0.2); color: #fca5a5; }
+        .badge.compliance { background: rgba(99, 102, 241, 0.2); color: #a5b4fc; }
+        .badge.quality { background: rgba(16,185,129,0.2); color: #6ee7b7; }
+        .badge.documentation { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; }
 
         .code { opacity: 0.7; font-weight: 400; color: #fff; }
         

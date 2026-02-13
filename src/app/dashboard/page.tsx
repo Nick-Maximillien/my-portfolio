@@ -9,17 +9,17 @@ export default function DashboardPage() {
   
   const [data, setData] = useState<ForensicResponse | null>(null);
 
-  // [NEW] State for toggling rule expansion in the sidebar
-  const [expandedViolations, setExpandedViolations] = useState<Set<number>>(new Set());
+  // Unified Toggle State using Rule Codes (for rules) or Index (for system halts)
+  const [expandedRules, setExpandedRules] = useState<Set<string>>(new Set());
 
-  const toggleViolation = (index: number) => {
-    const next = new Set(expandedViolations);
-    if (next.has(index)) {
-      next.delete(index);
+  const toggleRule = (id: string) => {
+    const next = new Set(expandedRules);
+    if (next.has(id)) {
+      next.delete(id);
     } else {
-      next.add(index);
+      next.add(id);
     }
-    setExpandedViolations(next);
+    setExpandedRules(next);
   };
 
   useEffect(() => {
@@ -62,23 +62,68 @@ export default function DashboardPage() {
             <div className="panel">
               <h2>Compliance Matrix</h2>
               <div className="space-y-3">
-                {/* Sourced from Forensic Evidence (Deterministic) - PASSED RULES */}
-                {data.forensic_evidence?.passed_rules?.map((rule, i) => (
-                  <div key={i} className="matrix-item pass">
-                    <span>{rule.code}</span>
-                    <span>PASS</span>
-                  </div>
-                ))}
+                {/* --- PASSED RULES (Clickable) --- */}
+                {data.forensic_evidence?.passed_rules?.map((rule, i) => {
+                  const isExpanded = expandedRules.has(rule.code);
+                  return (
+                    <div 
+                      key={`pass-${i}`} 
+                      className={`matrix-item pass ${isExpanded ? 'expanded' : ''}`}
+                      onClick={() => toggleRule(rule.code)}
+                    >
+                      <div className="matrix-header">
+                        <span>{rule.code}</span>
+                        <span>PASS</span>
+                      </div>
+                      {isExpanded && (
+                        <div className="expanded-details">
+                          <div className="rule-meta">SOURCE: {rule.protocol}</div>
+                          <p className="rule-text">"{rule.text}"</p>
+                          <div className="trace-msg success">✅ Verified: Forensic evidence found.</div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
                 
-                {/* ALSO SHOW FAILED RULES IN MATRIX */}
-                {data.forensic_evidence?.violations?.map((v, i) => (
-                  <div key={`fail-${i}`} className="matrix-item fail">
-                    <span>{v.rule.code}</span>
-                    <span>FAIL</span>
-                  </div>
-                ))}
+                {/* --- FAILED RULES (Clickable + Fix for TypeError) --- */}
+                {data.forensic_evidence?.violations?.map((v: any, i: number) => {
+                  // SAFE CHECK: Use rule code if it exists, otherwise use a generated ID for system halts
+                  const ruleId = v.rule?.code || `halt-${i}`;
+                  const isExpanded = expandedRules.has(ruleId);
+                  
+                  return (
+                    <div 
+                      key={`fail-${i}`} 
+                      className={`matrix-item fail ${isExpanded ? 'expanded' : ''}`}
+                      onClick={() => toggleRule(ruleId)}
+                    >
+                      <div className="matrix-header">
+                        <span>{v.rule?.code || "SYSTEM HALT"}</span>
+                        <span>FAIL</span>
+                      </div>
 
-                {/* Handle Empty State */}
+                      {isExpanded && (
+                        <div className="expanded-details">
+                          {v.protocol?.title && <div className="rule-meta">SOURCE: {v.protocol.title}</div>}
+                          {v.rule?.text && <p className="rule-text">"{v.rule.text}"</p>}
+                          <div className="trace-msg error">
+                            ❌ Reason: {v.validation_trace || v.violation}
+                          </div>
+                          {v.rule?.intent && (
+                            <div className="badges mt-2">
+                              {v.rule.intent.map((tag: string, idx: number) => (
+                                <span key={idx} className={`badge ${tag.toLowerCase()}`}>{tag}</span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+
+                {/* Empty State */}
                 {(!data.forensic_evidence?.passed_rules?.length && !data.forensic_evidence?.violations?.length) && (
                     <div className="text-gray-500 italic">No rules applicable to this document.</div>
                 )}
@@ -113,26 +158,33 @@ export default function DashboardPage() {
               <p className="no-violations">None detected.</p>
             ) : (
               <div className="space-y-4">
-                {data.forensic_evidence.violations.map((v, i) => {
-                  const isExpanded = expandedViolations.has(i);
+                {data.forensic_evidence.violations.map((v: any, i: number) => {
+                  const ruleId = v.rule?.code || `halt-${i}`;
                   return (
                     <div 
                       key={i} 
-                      className={`violation-item ${isExpanded ? 'expanded' : ''}`}
-                      onClick={() => toggleViolation(i)}
+                      className="violation-item"
+                      onClick={() => toggleRule(ruleId)}
                     >
-                      <div className="logic-source">
-                        {v.protocol?.title} <span className="opacity-70">({v.rule?.code})</span>
+                      <div className="violation-header">
+                        <div className="logic-source">
+                            {v.protocol?.title || "SYSTEM"} <span className="opacity-70">({v.rule?.code || "HALT"})</span>
+                        </div>
+                        <div className="badges">
+                            {v.rule?.intent?.map((tag: string, idx: number) => (
+                                <span key={idx} className={`badge ${tag.toLowerCase()}`}>{tag}</span>
+                            ))}
+                        </div>
                       </div>
                       
                       {v.rule?.text && (
                         <p className="law-text">"{v.rule.text}"</p>
                       )}
                       
-                      <p className="trace">{v.validation_trace}</p>
+                      <p className="trace">{v.validation_trace || v.violation}</p>
                       
                       <div className="hint-text">
-                        {isExpanded ? 'Show Less' : 'Read More'}
+                        {expandedRules.has(ruleId) ? 'Show Less' : 'Read More'}
                       </div>
                     </div>
                   );
@@ -242,14 +294,21 @@ export default function DashboardPage() {
         }
 
         .matrix-item {
+          border-radius: 12px;
+          font-family: monospace;
+          font-size: 0.875rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          overflow: hidden;
+        }
+        
+        .matrix-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
           padding: 0.75rem 1rem;
-          border-radius: 12px;
-          font-family: monospace;
-          font-size: 0.875rem;
         }
+
         .matrix-item.pass {
           background: rgba(34,197,94,0.1);
           color: var(--green);
@@ -261,11 +320,53 @@ export default function DashboardPage() {
           border: 1px solid rgba(239,68,68,0.2);
         }
 
-        .sidebar {
-          border-left: 4px solid var(--red);
+        .matrix-item.expanded {
+            background: #151e32;
+            border-color: var(--border);
+            margin: 0.75rem 0;
         }
 
-        /* --- UPDATED INTERACTIVE VIOLATIONS --- */
+        .expanded-details {
+            padding: 0 1rem 1rem 1rem;
+            color: var(--text);
+            font-family: system-ui, sans-serif;
+            animation: slideDown 0.2s ease-out;
+        }
+
+        .rule-meta {
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: var(--muted);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .rule-text {
+            font-style: italic;
+            font-size: 0.95rem;
+            margin-bottom: 1rem !important;
+            color: #cbd5e1;
+            padding-left: 0.75rem;
+            border-left: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .trace-msg {
+            font-size: 0.85rem;
+            padding: 0.5rem;
+            border-radius: 6px;
+            background: rgba(0,0,0,0.2);
+        }
+        .trace-msg.success { color: var(--green); }
+        .trace-msg.error { color: #fca5a5; }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .sidebar { border-left: 4px solid var(--red); }
+
         .violation-item {
           padding: 1rem;
           border-bottom: 1px solid rgba(255,255,255,0.08);
@@ -274,17 +375,14 @@ export default function DashboardPage() {
           transition: background 0.2s ease, border-color 0.2s;
         }
         
-        .violation-item:last-child {
-          border-bottom: none;
-        }
+        .violation-item:last-child { border-bottom: none; }
+        .violation-item:hover { background: rgba(255, 255, 255, 0.04); }
 
-        .violation-item:hover {
-          background: rgba(255, 255, 255, 0.04);
-        }
-
-        .violation-item.expanded {
-          background: #151e32;
-          border: 1px solid var(--blue);
+        .violation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 0.5rem;
         }
 
         .logic-source {
@@ -292,9 +390,25 @@ export default function DashboardPage() {
           font-weight: 700;
           text-transform: uppercase;
           color: var(--red);
-          margin-bottom: 0.5rem;
           letter-spacing: 0.02em;
         }
+
+        .badges { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+        .badge {
+            font-size: 0.6rem;
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .badge.safety { background: rgba(239,68,68,0.2); color: #fca5a5; }
+        .badge.compliance { background: rgba(59,130,246,0.2); color: #93c5fd; }
+        .badge.quality { background: rgba(16,185,129,0.2); color: #6ee7b7; }
+        .badge.billing { background: rgba(234, 179, 8, 0.2); color: #fde047; }
+        .badge.documentation { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; }
+        .badge.legal { background: rgba(236, 72, 153, 0.2); color: #f9a8d4; }
         
         .law-text {
           font-size: 0.9rem;
@@ -303,8 +417,6 @@ export default function DashboardPage() {
           margin-bottom: 0.5rem;
           padding-left: 0.75rem;
           border-left: 2px solid rgba(255,255,255,0.1);
-          
-          /* TRUNCATION LOGIC */
           display: -webkit-box;
           -webkit-line-clamp: 3;
           -webkit-box-orient: vertical;
@@ -312,17 +424,7 @@ export default function DashboardPage() {
           transition: all 0.2s ease;
         }
 
-        .violation-item.expanded .law-text {
-          -webkit-line-clamp: unset;
-          display: block;
-          overflow: visible;
-        }
-
-        .trace {
-          font-size: 0.85rem;
-          color: var(--muted);
-          margin-top: 0.5rem;
-        }
+        .trace { font-size: 0.85rem; color: var(--muted); margin-top: 0.5rem; }
 
         .hint-text {
           font-size: 0.7rem;
@@ -334,19 +436,8 @@ export default function DashboardPage() {
           text-align: right;
         }
 
-        .violation-item:hover .hint-text {
-          opacity: 1;
-          color: var(--blue);
-        }
-
-        .no-violations {
-          color: var(--muted);
-          font-style: italic;
-        }
-
-        .trace-panel {
-          background: #0f1523;
-        }
+        .no-violations { color: var(--muted); font-style: italic; }
+        .trace-panel { background: #0f1523; }
         
         .trace-logs {
           font-family: 'JetBrains Mono', monospace;
@@ -365,26 +456,15 @@ export default function DashboardPage() {
           border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
-        .trace-time {
-          color: var(--muted);
-          font-size: 0.75rem;
-        }
-
-        .trace-step {
-          font-weight: 700;
-          font-size: 0.75rem;
-          text-transform: uppercase;
-        }
+        .trace-time { color: var(--muted); font-size: 0.75rem; }
+        .trace-step { font-weight: 700; font-size: 0.75rem; text-transform: uppercase; }
         .trace-step.info { color: var(--blue); }
         .trace-step.success { color: var(--green); }
         .trace-step.error { color: var(--red); }
         .trace-step.critical { color: var(--red); }
         .trace-step.warning { color: var(--yellow); }
 
-        .trace-msg {
-          color: var(--text);
-          line-height: 1.4;
-        }
+        .trace-msg { color: var(--text); line-height: 1.4; }
 
         footer {
           margin-top: 4rem;
@@ -395,14 +475,8 @@ export default function DashboardPage() {
         }
 
         @media (max-width: 768px) {
-          .dashboard-header {
-            flex-direction: column;
-            gap: 1rem;
-          }
-          .trace-entry {
-            grid-template-columns: 1fr;
-            gap: 0.25rem;
-          }
+          .dashboard-header { flex-direction: column; gap: 1rem; }
+          .trace-entry { grid-template-columns: 1fr; gap: 0.25rem; }
         }
       `}</style>
     </>
