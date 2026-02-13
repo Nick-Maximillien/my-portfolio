@@ -2,6 +2,78 @@
 import { useState } from 'react';
 import { runForensicAgent, ForensicResponse } from '../lib/api';
 
+// --- CURATED RESEARCH RENDERER ---
+// Parses raw LLM Markdown into a structured, styled Forensic Report
+const ResearchRenderer = ({ content }: { content: string }) => {
+  if (!content) return null;
+
+  const lines = content.split('\n');
+  const elements: JSX.Element[] = [];
+  
+  let listBuffer: JSX.Element[] = [];
+
+  const flushList = () => {
+    if (listBuffer.length > 0) {
+      elements.push(
+        <ul key={`list-${elements.length}`} className="md-list">
+          {listBuffer}
+        </ul>
+      );
+      listBuffer = [];
+    }
+  };
+
+  const processInline = (text: string) => {
+    // Splits by bold syntax (**text**) and Citations [Source]
+    const parts = text.split(/(\*\*.*?\*\*|\[.*?\])/g);
+    return parts.map((part, i) => {
+      // Bold
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={i} className="md-bold">{part.slice(2, -2)}</strong>;
+      }
+      // Citation Badge [Standard 7.5]
+      if (part.startsWith('[') && part.endsWith(']')) {
+         // Basic heuristic to avoid checkboxes [ ]
+         if (part.length > 3) {
+           return <span key={i} className="md-citation">{part}</span>;
+         }
+      }
+      return part;
+    });
+  };
+
+  lines.forEach((line, i) => {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      flushList();
+      elements.push(<div key={`spacer-${i}`} className="md-spacer" />);
+      return;
+    }
+
+    // Headers (## Title)
+    if (trimmed.startsWith('##')) {
+      flushList();
+      const text = trimmed.replace(/^#+\s*/, '');
+      elements.push(<h3 key={i} className="md-header">{processInline(text)}</h3>);
+    } 
+    // Bullet Points (* Item)
+    else if (trimmed.startsWith('* ') || trimmed.startsWith('- ')) {
+      const text = trimmed.replace(/^[\*\-]\s+/, '');
+      listBuffer.push(<li key={i} className="md-list-item">{processInline(text)}</li>);
+    } 
+    // Standard Text
+    else {
+      flushList();
+      elements.push(<p key={i} className="md-p">{processInline(trimmed)}</p>);
+    }
+  });
+
+  flushList();
+
+  return <div className="forensic-report-body">{elements}</div>;
+};
+
+
 export default function ResearchPage() {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
@@ -142,28 +214,16 @@ export default function ResearchPage() {
           </section>
         )}
 
-        {/* 2. FORENSIC ANALYSIS */}
+        {/* 2. FORENSIC ANALYSIS (CURATED RENDERER) */}
         {summary && (
           <section className="analysis-panel">
             <h2>Protocol Interpretation</h2>
-            <div 
-  className="analysis-disclaimer" 
-  style={{
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    color: '#e7ebf3',
-    padding: '15px',
-    borderRadius: '8px',
-    fontSize: '0.9rem',
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
-    border: '1px solid #d1dbe5',
-    fontWeight: '900'
-  }}
->
-  This explanation is a grounded rendering of retrieved clinical protocol clauses. No clinical decisions, prioritization, or personalization is performed.
-</div>
+            <div className="analysis-disclaimer">
+              This explanation is a grounded rendering of retrieved clinical protocol clauses. No clinical decisions, prioritization, or personalization is performed.
+            </div>
 
-            <div className="analysis-text whitespace-pre-wrap">
-              {summary}
+            <div className="analysis-container">
+               <ResearchRenderer content={summary} />
             </div>
           </section>
         )}
@@ -367,20 +427,102 @@ export default function ResearchPage() {
         .trace-step.warning, .trace-step.planning { color: var(--yellow); }
         .trace-msg { color: var(--text); line-height: 1.4; }
 
-        /* --- ANALYSIS PANEL --- */
+        /* --- ANALYSIS PANEL (The Curated Report) --- */
         .analysis-panel {
-          background: rgba(59, 130, 246, 0.08); /* Blue Tint */
-          border: 1px solid var(--blue);
+          background: rgba(18, 25, 51, 0.6);
+          border: 1px solid rgba(59, 130, 246, 0.3);
           border-radius: 18px;
           padding: 2.5rem;
           margin-bottom: 2.5rem;
+          position: relative;
+          overflow: hidden;
+        }
+        
+        /* Subtle Glow effect */
+        .analysis-panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--blue), transparent);
+            opacity: 0.5;
         }
 
-        .analysis-text {
-          font-size: 1.1rem;
-          line-height: 1.7;
-          color: #fff;
-          font-weight: 400;
+        .analysis-disclaimer {
+          background-color: rgba(11, 16, 32, 0.6);
+          color: var(--muted);
+          padding: 12px 16px;
+          border-radius: 8px;
+          fontSize: 0.85rem;
+          border: 1px solid var(--border);
+          margin-bottom: 1.5rem;
+          font-style: italic;
+        }
+
+        /* --- MARKDOWN RENDERER STYLES --- */
+        .forensic-report-body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: #eceff4;
+            line-height: 1.75;
+            font-size: 1.05rem;
+        }
+        
+        /* Headers */
+        :global(.md-header) {
+            font-size: 1.3rem;
+            color: var(--blue);
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+            padding-bottom: 6px;
+        }
+        
+        /* Paragraphs */
+        :global(.md-p) {
+            margin-bottom: 1rem;
+            color: #d1d5db;
+        }
+        
+        /* Bold Text */
+        :global(.md-bold) {
+            color: white;
+            font-weight: 600;
+        }
+        
+        /* Lists */
+        :global(.md-list) {
+            margin: 0.5rem 0 1.5rem 0;
+            padding-left: 1.5rem;
+            list-style-type: disc;
+        }
+        
+        :global(.md-list-item) {
+            margin-bottom: 0.5rem;
+            padding-left: 0.5rem;
+            color: #d1d5db;
+        }
+        :global(.md-list-item::marker) {
+            color: var(--blue);
+        }
+
+        /* Citation Badges */
+        :global(.md-citation) {
+            display: inline-block;
+            font-size: 0.75rem;
+            background: rgba(59, 130, 246, 0.15);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 4px;
+            padding: 1px 6px;
+            margin-left: 6px;
+            vertical-align: text-top;
+            font-family: 'JetBrains Mono', monospace;
+            cursor: help;
+        }
+        
+        :global(.md-spacer) {
+            height: 0.5rem;
         }
 
         /* --- RESULTS STYLES --- */
